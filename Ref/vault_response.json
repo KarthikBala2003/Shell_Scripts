@@ -1,0 +1,21 @@
+{
+    "request_id": "7c7ba869-85a2-1b4c-6995-925ff33ee577",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "data": {
+            "usr1_key": "karthik",
+            "usr1_val": "asdef#"
+        },
+        "metadata": {
+            "created_time": "2021-02-02T17:39:58.9297967Z",
+            "deletion_time": "",
+            "destroyed": false,
+            "version": 1
+        }
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}

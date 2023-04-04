@@ -1,0 +1,87 @@
+This is a text file
+Some special character calculate % of marks 
+This is a sample email karthikbala@gmail.com to extract
+Addition special characters add #Port in the text field and find *Pattern*
+The prequel of this chapter contains a tutorial on regular
+  expressions that allows a reader unfamiliar with regular
+  expressions to move quickly from simple to complex elements of
+  regular expression syntax. This tutorial is aimed primarily at
+  beginners, but programmers familiar with regular expressions in
+  other programming tools can benefit from a quick read of the
+  tutorial, which explicates the particular regular expression
+  dialect in Python.
+
+  It is important to note up-front that regular expressions,
+  while very powerful, also have limitations.  In brief, regular
+  expressions cannot match patterns that nest to arbitrary
+  depths.  If that statement does not make sense, read Chapter 4,
+  which discusses parsers--to a large extent, parsing exists to
+  address the limitations of regular expressions.  In general, if
+  you have doubts about whether a regular expression is
+  sufficient for your task, try to understand the examples in
+  Chapter 4, particularly the discussion of how you might spell a
+  floating point number.
+
+  Section 3.1 examines a number of text processing problems that
+  are solved most naturally using regular expression.  As in
+  other chapters, the solutions presented to problems can
+  generally be adopted directly as little utilities for performing
+  tasks.  However, as elsewhere, the larger goal in presenting
+  problems and solutions is to address a style of thinking about
+  a wider class of problems than those whose solutions are
+  presented directly in this book.  Readers who are interested
+  in a range of ready utilities and modules will probably want to
+  check additional resources on the Web, such as the Vaults of
+  Parnassus <http://www.vex.net/parnassus/> and the Python
+  Cookbook <http://aspn.activestate.com/ASPN/Python/Cookbook/>.
+  Data Samples
+============
+============
+ListenStream=22
+ListenStream=22
+Port=2254
+Port=2254
+#ssh_port=123
+#ssh_port=123
+
+data1: AttributeName
+data2: AttributeGroup
+
+.. index:
+   single: data
+
+Basic Unix commands
+-------------------
+ #. :download:`hamlet <examples/hamlet.txt>`
+
+Using a text editor and regular expressions
+-------------------------------------------
+
+  #. :download:`TextWrangler tutorial <examples/TextWrangler Tutorial (4.0).pdf>`
+  #. :download:`Lorem ipsum <examples/Lorem.txt>`
+  #. :download:`Email <examples/email.txt>`
+  #. :download:`Find and replace <examples/Find and Replace Sample.txt>`
+  #. :download:`Ch3observations <examples/Ch3.txt>`
+
+Remote computing and web page generation
+----------------------------------------
+
+No data samples.
+
+Python Basics I
+---------------
+
+No data samples.
+
+Python Basics II
+----------------
+
+  1. :download:`sequence1 <examples/sequence1.txt>`
+  2. :download:`hamlet <examples/hamlet.txt>`
+
+Python Modules
+--------------
+
+  #. :download:`CSV sample data <examples/test_scores.csv>`
+  #. :download:`CSV exercise solution <examples/calc_scores.py>`
+

@@ -1,0 +1,27 @@
+
+sudo apt-get install portaudio19-dev libffi-dev libssl-dev
+
+python -m pip install --upgrade google-assistant-sdk[samples]
+
+pip install google-auth
+
+python -m pip install --upgrade google-auth-oauthlib[tool]
+
+pip freeze | grep google
+
+locate google-oauthlib-tool
+
+pip install --upgrade google-auth-oauthlib[tool]
+google-oauthlib-tool --client-secrets /home/karthikb/project/scripts/gvoice/client_secret_754601274146.json --scope https://www.googleapis.com/auth/assistant-sdk-prototype --save --headless
+
+google-oauthlib-tool --client-secrets client_secret_754601274146.json \
+                     --credentials app/src/main/res/raw/credentials.json \
+                     --scope https://www.googleapis.com/auth/assistant-sdk-prototype \
+                     --save
+
+google-oauthlib-tool --scope https://www.googleapis.com/auth/assistant-sdk-prototype \
+      --save --headless --client-secrets /home/karthikb/project/scripts/gvoice/client_secret_479560052879.json
+
+
+
+

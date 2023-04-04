@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "D:\DEV\Scripts\BASH\Ref\hellopy.py", line 4, in <module>
+    print("Your name is %s and email is %s" % (name, email))
+NameError: name 'name' is not defined. Did you mean: 'name1'?
