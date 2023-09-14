@@ -29,6 +29,14 @@ print_metrics_arrays() {
       echo -e "Error: All arrays must have the same length.\n$header1: ${#mnemonic_array[@]}  $header2: ${#uptime_array[@]}  $header3: $len_memfree_array"
       return 1
   fi
+  
+  #creating empty array updated_uptime
+  updated_uptime=()
+
+  for i in "${uptime_array[@]}"; do
+  #removing comma from data in uptime_array and storing it in updated_uptime array
+    updated_uptime+=("$(echo "$i" | tr -d ',')")
+  done
 
   # Call the function to calculate averages and store them in a n
   calculate_average "${memfree_array[@]}"
@@ -37,10 +45,11 @@ print_metrics_arrays() {
     
     # printf "%.2f\n" "${result_array[i]}"
     mnemonic="${mnemonic_array[i]//[$'\r']}"
-    uptime="${uptime_array[i]//[$'\r']}"
+    uptime="${updated_uptime[i]//[$'\r']}"
     printf "%-15s %-15s %.2f %s\n" "$mnemonic" "$uptime" "${result_array[i]}" >> metrics.txt
     
   done
+  generate_csv
 }
 
 # Function to calculate the average of every three elements
@@ -69,13 +78,15 @@ calculate_average() {
     val3=$(echo ${e3%% kB})
       
     # Calculate the sum of the numeric values
-    sum=$((val1 + val2 + val3))
+    #sum=$((val1 + val2 + val3))
     
     # Calculate the average and store it in a new array
-    average=$((sum / 3))
+    #average=$((sum / 3))
+    average=$(echo "scale=2; ($val1 + $val2 + $val3) / 3" | bc)
     
     # Format the average with two decimal places
-    formatted_average=$(printf "%.2f" "$(bc -l <<< "$average / 1.0")")
+    #formatted_average=$(printf "%.2f" "$(bc -l <<< "$average / 1.0")")
+    formatted_average=$(printf "%.2f" $average)
 
     # Add the formatted average to the result array
     result_array+=("$formatted_average")
@@ -85,6 +96,45 @@ calculate_average() {
   # Print the result array
   # echo "${result_array[@]}"
 
+}
+#function to generate csv file
+generate_csv() {
+    check_file="metrics.txt"
+    if [ -e "$check_file" ]; then
+      input="metrics.txt"
+      output="metrics.csv"
+
+      echo "Mnemonic,Uptime,Memfree" > "$output"
+      #reading from second line of input text file
+      tail -n +2 "$input" | while IFS= read -r line; do
+          mnemonic=$(echo "$line" | awk '{print $1}')
+          uptime=$(echo "$line" | awk '{print $2 " " $3 " " $4}')
+          memfree=$(echo "$line" | awk '{print $5}')
+          echo "$mnemonic,$uptime,$memfree" >> "$output"
+       done
+       echo "CSV file saved as metrics.csv"
+     else
+       echo "file does not exist"
+    fi
+}
+
+convert_to_hours() {
+    # input="1 day 18:44"
+    input="$1"
+    IFS=' ' read -ra parts <<< "$input"
+    day_part="${parts[0]}"  # Extract the day part
+    time_part="${parts[2]}"  # Extract the time part
+    IFS=':' read -ra time_parts <<< "$time_part"
+    hours="${time_parts[0]}"  # Extract the hours
+    minutes="${time_parts[1]}"  # Extract the minutes
+
+    # Convert day_part and hours to hours and then add them together
+    total_hours=$((day_part * 24 + hours))
+
+    # Format the result as "total_hours:minutes"
+    result="${total_hours}:${minutes}"
+
+    echo "$result"
 }
 
 # Call the function to print the arrays

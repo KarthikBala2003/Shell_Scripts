@@ -51,7 +51,7 @@ print_metrics_arrays() {
     printf "%-15s %-15s %.2f %s\n" "$mnemonic" "$uptime" "${result_array[i]}" >> metrics.txt
     
   done
-  generate_csv
+  # generate_csv
 }
 
 # Function to calculate the average of every three elements
@@ -112,6 +112,8 @@ generate_csv() {
           mnemonic=$(echo "$line" | awk '{print $1}')
           uptime=$(echo "$line" | awk '{print $2 " " $3 " " $4}')
           memfree=$(echo "$line" | awk '{print $5}')
+          # memfree=$(echo "$line" | awk -F ',' '{gsub(",", "", $1); print}')
+          
           echo "$mnemonic,$uptime,$memfree" >> "$output"
        done
        echo "CSV file saved as metrics.csv"
@@ -134,7 +136,7 @@ convert_to_hours() {
     total_hours=$((day_part * 24 + hours))
 
     # Format the result as "total_hours:minutes"
-    result="${total_hours}:${minutes}"
+    result="${total_hours}:${minutes},"
 
     echo "$result"
 }
