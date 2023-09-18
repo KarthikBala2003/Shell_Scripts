@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.table import Table
+import numpy as np
 
 # Function to read data from a CSV file without pandas
 def read_data(file_path, delimiter=','):
@@ -35,7 +36,7 @@ def read_data(file_path, delimiter=','):
 
 # Function to plot data
 def plot_data(data):
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(12,8))
 
     # Plot Uptime
     ax.plot(data['Soak Duration'], data['Uptime'], marker='o', linestyle='-', color='b', label='Uptime')
@@ -49,26 +50,22 @@ def plot_data(data):
     ax.legend()
     ax.grid(True)
 
-    # Add some space below the X-axis
-    plt.subplots_adjust(bottom=0.2)
+    # Create a table above the plot using numpy with reduced line margins
+    table_data = [['Soak Duration', 'Uptime', 'Free Mem']] + \
+                 [[str(data['Soak Duration'][i]), str(data['Uptime'][i]), str(data['Free Mem'][i])] for i in range(len(data['Soak Duration']))]
 
-    # Add data as a table
-    table_data = []
-    table_data.append(['Soak Duration', 'Uptime', 'Free Mem'])
-    for i in range(len(data['Soak Duration'])):
-        table_data.append([data['Soak Duration'][i], data['Uptime'][i], data['Free Mem'][i]])
-
-    table = ax.table(cellText=table_data, loc='bottom', cellLoc='center')
+    table = np.array(table_data)
+    table = ax.table(cellText=table, cellLoc='center', bbox=[0, 1.1, 1, 0.6])  # Adjust the bbox as needed
     table.auto_set_font_size(False)
     table.set_fontsize(10)
-    table.scale(1, 1.2)
+    table.scale(1, 1.5)  # Adjust the scaling factor as needed
 
     plt.tight_layout()
     plt.show()
 
 # Main function
 def main():
-    file_path = 'metrics_data.csv'  # Change to the path of your data file
+    file_path = 'metrics.csv'  # Change to the path of your data file
     data = read_data(file_path, delimiter=',')  # Specify the correct delimiter
     plot_data(data)
 

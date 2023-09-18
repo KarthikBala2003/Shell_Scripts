@@ -1,57 +1,109 @@
 #! /usr/bin/env bash
 
+# Initialize all arrays
+soak_duration_array=()
+mnemonic_array=()
+updated_uptime=()
+memfree_array=()
+
 result_array=()
 
-print_metrics_arrays() {
-  # Initialize column headers
-  header1="Mnemonic"
-  header2="Uptime"
-  header3="MemFree"
+# declare variables for file names
+metrics_suffix="_Metrics.txt"
+combined_csv_file="metrics.txt"
+first_input_file="Iteration1.txt"
 
-  # Print headers with equal spacing
-  printf "%-15s %-15s %-15s\n" "$header1" "$header2" "$header3" >> metrics.txt
+search_string1="the Mnemonic:"
 
-  # Define the metrics arrays
-  mnemonic_array=()
-  readarray -t mnemonic_array < <(grep "the Mnemonic:" Iteration2.txt | cut -d':' -f2 | xargs -I MN echo 'MN')
- 
+# Initialize column headers
+header1="Device"
+header2="Uptime"
+header3="MemFree"
+
+# Print headers with equal spacing
+printf "%-15s %-15s %-15s\n" "$header1,$header2,$header3" >> "$combined_csv_file"
+
+# For source file Device Array wrrriten in Column 1
+readarray -t mnemonic_array < <(grep "$search_string1" "$first_input_file" | cut -d':' -f2 | xargs -I MN echo 'MN')
+
+# Create data array
+build_metrics_arrays() {
+  local input_file="$1"
+  local search_string2="day"
+  local search_string3="MemFree:"
+
+  # rm metrics.csv
+  
+  # Call the function to remove carriage return characters
+  remove_delimiter "mnemonic_array" $'\r'
+
+  # Create metrics output files to log data - e.g G-120G-E_Metrics.txt
+  # create_files "${mnemonic_array[@]}"
+
+  # Column 1 - Soak Duraion
+  soak_duration_array=($(seq 0 8 72))
+
+  # Column 2 - Uptime
   uptime_array=()
-  readarray -t uptime_array < <(grep "day" Iteration2.txt | cut -d',' -f1-2 | cut -d' ' -f4-6 | xargs -I UP echo 'UP') 
+  readarray -t uptime_array < <(grep "$search_string2" "$input_file" | cut -d',' -f1-2 | cut -d' ' -f4-6 | xargs -I UP echo 'UP')
 
-  memfree_array=()
-  readarray -t memfree_array < <(grep "MemFree:" Iteration2.txt | cut -d':' -f2 | xargs -I MF echo 'MF')
+  # Call the function to remove carriage return characters
+  remove_delimiter "uptime_array" $'\r'
+
+  #creating empty array updated_uptime
+  for i in "${uptime_array[@]}"; do
+    #removing comma from data in uptime_array and storing it in updated_uptime array
+    updated_uptime+=("$(echo "$i" | tr -d ',')")
+  done
+
+  # Print the Uptime array elements
+  # echo "Uptime"
+  # for element in "${updated_uptime[@]}"; do
+  #   echo "$element"
+  # done
+  
+  # Column 3 - Free Memory
+  readarray -t memfree_array < <(grep "$search_string3" "$input_file" | cut -d':' -f2 | xargs -I MF echo 'MF')
 
   len_memfree_array=${#memfree_array[@]}
   memfree_avg="$((len_memfree_array/3))"
-     
-  # Check if all three arrays have the same length
-  if [ ${#mnemonic_array[@]} -ne ${#uptime_array[@]} ] || [ ${#mnemonic_array[@]} -ne $memfree_avg ]; then
-      echo -e "Error: All arrays must have the same length.\n$header1: ${#mnemonic_array[@]}  $header2: ${#uptime_array[@]}  $header3: $len_memfree_array"
-      return 1
-  fi
-  
-  #creating empty array updated_uptime
-  updated_uptime=()
-
-  for i in "${uptime_array[@]}"; do
-  #removing comma from data in uptime_array and storing it in updated_uptime array
-    updated_uptime+=("$(echo "$i" | tr -d ',')")
-  done
 
   # Call the function to calculate averages and store them in a n
   calculate_average "${memfree_array[@]}"
 
+    # Call the function to remove carriage return characters
+  remove_delimiter "memfree_array" $' kB'
+
+  # Print the Uptime array elements
+  # echo "MemFree"
+  # for element in "${memfree_array[@]}"; do
+  #   echo "$element"
+  # done
+
+  # Print the data metrics array
+  
   for i in "${!mnemonic_array[@]}"; do
+  #for i in "${!soak_duration_array[@]}"; do
     
     # printf "%.2f\n" "${result_array[i]}"
-    mnemonic="${mnemonic_array[i]//[$'\r']}"
-    uptime="${updated_uptime[i]//[$'\r']}"
-   
+    uptime="${updated_uptime[i]}"
     uptime=$(convert_to_hours "$uptime")
-    printf "%-15s %-15s %.2f %s\n" "$mnemonic" "$uptime" "${result_array[i]}" >> metrics.txt
+    # printf "%-15s %-15s %s\n" "${soak_duration_array[i]},$uptime,${result_array[i]}" >> "$combined_csv_file"
+    printf "%-15s %-15s %s\n" "${mnemonic_array[i]},$uptime,${result_array[i]}" >> "$combined_csv_file"
     
   done
-  # generate_csv
+
+}
+
+## Function to remove a specified delimiter from array elements
+remove_delimiter() {
+  local array_name=("$1")      # Get the array name as the first argument
+  local delimiter="$2"         # Get the delimiter to remove as the second argument
+  local -n array_ref="$array_name"  # Create a reference to the array
+
+  for i in "${!array_ref[@]}"; do
+    array_ref[$i]=${array_ref[$i]//$delimiter/}  # Use parameter expansion to remove the delimiter
+  done
 }
 
 # Function to calculate the average of every three elements
@@ -88,7 +140,7 @@ calculate_average() {
     
     # Format the average with two decimal places
     #formatted_average=$(printf "%.2f" "$(bc -l <<< "$average / 1.0")")
-    formatted_average=$(printf "%.2f" $average)
+    formatted_average=$(printf "%.0f" $average)
 
     # Add the formatted average to the result array
     result_array+=("$formatted_average")
@@ -99,29 +151,8 @@ calculate_average() {
   # echo "${result_array[@]}"
 
 }
-#function to generate csv file
-generate_csv() {
-    check_file="metrics.txt"
-    if [ -e "$check_file" ]; then
-      input="metrics.txt"
-      output="metrics.csv"
 
-      echo "Mnemonic,Uptime,Memfree" > "$output"
-      #reading from second line of input text file
-      tail -n +2 "$input" | while IFS= read -r line; do
-          mnemonic=$(echo "$line" | awk '{print $1}')
-          uptime=$(echo "$line" | awk '{print $2 " " $3 " " $4}')
-          memfree=$(echo "$line" | awk '{print $5}')
-          # memfree=$(echo "$line" | awk -F ',' '{gsub(",", "", $1); print}')
-          
-          echo "$mnemonic,$uptime,$memfree" >> "$output"
-       done
-       echo "CSV file saved as metrics.csv"
-     else
-       echo "file does not exist"
-    fi
-}
-
+# Convert hours from day and skip minutes
 convert_to_hours() {
     # input="1 day 18:44"
     input="$1"
@@ -136,10 +167,25 @@ convert_to_hours() {
     total_hours=$((day_part * 24 + hours))
 
     # Format the result as "total_hours:minutes"
-    result="${total_hours}:${minutes},"
+    # result="${total_hours}:${minutes},"
+    result="${total_hours}"
 
     echo "$result"
 }
 
-# Call the function to print the arrays
-print_metrics_arrays
+# Create metrics output file for logging metrics details
+create_files() {
+
+  local device_array=("$@")  # Get the array as an argument
+  
+  for i in "${!device_array[@]}"; do
+     mnemonic="${device_array[i]//[$'\r']}"
+     filename="$mnemonic""_$metrics_suffix"
+     touch "$filename" 
+  done
+}
+
+build_metrics_arrays "Iteration1.txt"
+build_metrics_arrays "Iteration2.txt"
+build_metrics_arrays "Iteration3.txt"
+# python plot_device_metrics.py

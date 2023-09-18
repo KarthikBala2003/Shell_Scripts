@@ -1754,7 +1754,7 @@ instance type  en mode        Status(IPv4/IPv6)               IPv4Addr        Ne
 010301   dhcp   1  1  Disconnected/Unconfigured                -               -               -                              -                                       -                                           -                                       -                                                                               -         3_INTERNET_R_VID_981
 ==============================================================================================
 [root@AONT: ONTUSER]# uptime
- 11:07:45 up 2 day, 18:46, load average: 4.25, 3.98, 3.97
+ 11:07:45 up 1 day, 18:46, load average: 4.25, 3.98, 3.97
 [root@AONT: ONTUSER]# free
               total         used         free       shared      buffers
   Mem:       248828       222588        26240         6788         7448
@@ -1813,7 +1813,7 @@ VmallocChunk:     966940 kB
 IMEM Remains:     8952 Bytes
 [root@AONT: ONTUSER]# cat /proc/meminfo
 MemTotal:         248828 kB
-MemFree:          300000 kB
+MemFree:           26256 kB
 MemAvailable:      74836 kB
 Buffers:            7448 kB
 Cached:            50948 kB
@@ -1849,7 +1849,7 @@ VmallocChunk:     966940 kB
 IMEM Remains:     8952 Bytes
 [root@AONT: ONTUSER]# cat /proc/meminfo
 MemTotal:         248828 kB
-MemFree:          200000 kB
+MemFree:           26256 kB
 MemAvailable:      74836 kB
 Buffers:            7448 kB
 Cached:            50948 kB
@@ -1965,7 +1965,7 @@ instance type  en mode        Status(IPv4/IPv6)               IPv4Addr        Ne
 010201   dhcp   1  1     Connected/Unconfigured        20.0.0.22   255.255.255.0      20.0.0.201                       20.0.0.3                                       -                                           -                                       -                                                                               -     2_VOIP_INTERNET_R_VID_30
 ==============================================================================================
 [root@AONT: ONTUSER]# uptime
- 11:09:40 up 1 day, 18:48, load average: 5.26, 4.53, 3.99
+ 11:09:40 up 2 day, 18:48, load average: 5.26, 4.53, 3.99
 [root@AONT: ONTUSER]# free
               total         used         free       shared      buffers
   Mem:       252544       147840       104704         7700         7076
@@ -1988,7 +1988,7 @@ Total:       252544       148020       104524
 Total:       252544       148020       104524
 [root@AONT: ONTUSER]# cat /proc/meminfo
 MemTotal:         252544 kB
-MemFree:          100000 kB
+MemFree:          354524 kB
 MemAvailable:     153888 kB
 Buffers:            7076 kB
 Cached:            53280 kB
@@ -2060,7 +2060,7 @@ VmallocChunk:     968452 kB
 IMEM Remains:    22004 Bytes
 [root@AONT: ONTUSER]# cat /proc/meminfo
 MemTotal:         252544 kB
-MemFree:          104500 kB
+MemFree:          104524 kB
 MemAvailable:     153888 kB
 Buffers:            7076 kB
 Cached:            53280 kB
@@ -2133,7 +2133,8 @@ the CountryID:eu
 the GroupID:00000000
 [root@AONT: ONTUSER]# cat /etc/buildinfo
 ONT_TYPE=g240wf
-PON_MODE=GPONG-120G-E
+PON_MODE=GPON
+SOFTWAREVERSION=HJK.K58p02
 PRODUCTCLASS=g240wf
 RELEASE=0.0.0
 BUILDSTAMP=
@@ -2175,7 +2176,7 @@ instance type  en mode        Status(IPv4/IPv6)               IPv4Addr        Ne
 010301   dhcp   1  1     Connected/Unconfigured        20.0.0.17   255.255.255.0      20.0.0.201                       20.0.0.3                                       -                                           -                                       -                                                                               -     3_VOIP_INTERNET_R_VID_30
 ==============================================================================================
 [root@AONT: ONTUSER]# uptime
- 11:11:34 up 3 day, 18:37, load average: 4.96, 4.83, 4.09
+ 11:11:34 up 1 day, 18:37, load average: 4.96, 4.83, 4.09
 [root@AONT: ONTUSER]# free
               total         used         free       shared      buffers
   Mem:       252544       145148       107396         6420         7292
@@ -2234,7 +2235,7 @@ VmallocChunk:     974096 kB
 IMEM Remains:    22004 Bytes
 [root@AONT: ONTUSER]# cat /proc/meminfo
 MemTotal:         252544 kB
-MemFree:          10000 kB
+MemFree:          107396 kB
 MemAvailable:     155808 kB
 Buffers:            7292 kB
 Cached:            50704 kB
