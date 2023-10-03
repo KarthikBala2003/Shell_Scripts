@@ -1,3 +1,4 @@
+
 #! /usr/bin/env bash
 
 # Initialize all arrays
@@ -8,44 +9,30 @@ memfree_array=()
 
 result_array=()
 
-# declare variables for file names
 metrics_suffix="_Metrics.txt"
-combined_csv_file="metrics.txt"
-first_input_file="Iteration1.txt"
-
-search_string1="the Mnemonic:"
-
-# Initialize column headers
-header1="Device"
-header2="Uptime"
-header3="MemFree"
-
-# Print headers with equal spacing
-printf "%-15s %-15s %-15s\n" "$header1,$header2,$header3" >> "$combined_csv_file"
-
-# For source file Device Array wrrriten in Column 1
-readarray -t mnemonic_array < <(grep "$search_string1" "$first_input_file" | cut -d':' -f2 | xargs -I MN echo 'MN')
 
 # Create data array
 build_metrics_arrays() {
-  local input_file="$1"
-  local search_string2="day"
-  local search_string3="MemFree:"
+  # Initialize column headers
+  header1="Soak Duration"
+  header2="Uptime"
+  header3="MemFree"
 
-  # rm metrics.csv
+  # Device Array
+  readarray -t mnemonic_array < <(grep "the Mnemonic:" Iteration2.txt | cut -d':' -f2 | xargs -I MN echo 'MN')
   
   # Call the function to remove carriage return characters
   remove_delimiter "mnemonic_array" $'\r'
 
-  # Create metrics output files to log data - e.g G-120G-E_Metrics.txt
+  # Create metrics output files to log data
   # create_files "${mnemonic_array[@]}"
 
-  # Column 1 - Soak Duraion
+   # Column 1 - Soak Duraion
   soak_duration_array=($(seq 0 8 72))
 
   # Column 2 - Uptime
   uptime_array=()
-  readarray -t uptime_array < <(grep "$search_string2" "$input_file" | cut -d',' -f1-2 | cut -d' ' -f4-6 | xargs -I UP echo 'UP')
+  readarray -t uptime_array < <(grep "day" Iteration2.txt | cut -d',' -f1-2 | cut -d' ' -f4-6 | xargs -I UP echo 'UP')
 
   # Call the function to remove carriage return characters
   remove_delimiter "uptime_array" $'\r'
@@ -63,7 +50,7 @@ build_metrics_arrays() {
   # done
   
   # Column 3 - Free Memory
-  readarray -t memfree_array < <(grep "$search_string3" "$input_file" | cut -d':' -f2 | xargs -I MF echo 'MF')
+  readarray -t memfree_array < <(grep "MemFree:" Iteration2.txt | cut -d':' -f2 | xargs -I MF echo 'MF')
 
   len_memfree_array=${#memfree_array[@]}
   memfree_avg="$((len_memfree_array/3))"
@@ -81,17 +68,19 @@ build_metrics_arrays() {
   # done
 
   # Print the data metrics array
+  # Print headers with equal spacing
+  printf "%-15s %-15s %-15s\n" "$header1,$header2,$header3" >> metrics.csv
   
-  for i in "${!mnemonic_array[@]}"; do
-  #for i in "${!soak_duration_array[@]}"; do
+   for i in "${!mnemonic_array[@]}"; do
     
     # printf "%.2f\n" "${result_array[i]}"
     uptime="${updated_uptime[i]}"
     uptime=$(convert_to_hours "$uptime")
-    # printf "%-15s %-15s %s\n" "${soak_duration_array[i]},$uptime,${result_array[i]}" >> "$combined_csv_file"
-    printf "%-15s %-15s %s\n" "${mnemonic_array[i]},$uptime,${result_array[i]}" >> "$combined_csv_file"
+    printf "%-15s %-15s %s\n" "${mnemonic_array[i]},$uptime,${result_array[i]}" >> metrics.csv
     
   done
+  write_files
+  final_csv
 
 }
 
@@ -104,6 +93,60 @@ remove_delimiter() {
   for i in "${!array_ref[@]}"; do
     array_ref[$i]=${array_ref[$i]//$delimiter/}  # Use parameter expansion to remove the delimiter
   done
+}
+
+print_metrics_arrays() {
+  # Initialize column headers
+  header1="Mnemonic"
+  header2="Uptime"
+  header3="MemFree"
+
+
+   # Define the metrics arrays
+  mnemonic_array=()
+  readarray -t mnemonic_array < <(grep "the Mnemonic:" Iteration2.txt | cut -d':' -f2 | xargs -I MN echo 'MN')
+
+  #create_files "${mnemonic_array[@]}"
+
+  exit 0
+ 
+  uptime_array=()
+  readarray -t uptime_array < <(grep "day" Iteration2.txt | cut -d',' -f1-2 | cut -d' ' -f4-6 | xargs -I UP echo 'UP') 
+
+  memfree_array=()
+  readarray -t memfree_array < <(grep "MemFree:" Iteration2.txt | cut -d':' -f2 | xargs -I MF echo 'MF')
+
+  len_memfree_array=${#memfree_array[@]}
+  memfree_avg="$((len_memfree_array/3))"
+     
+  # Check if all three arrays have the same length
+  if [ ${#mnemonic_array[@]} -ne ${#uptime_array[@]} ] || [ ${#mnemonic_array[@]} -ne $memfree_avg ]; then
+      echo -e "Error: All arrays must have the same length.\n$header1: ${#mnemonic_array[@]}  $header2: ${#uptime_array[@]}  $header3: $len_memfree_array"
+      return 1
+  fi
+  
+  #creating empty array updated_uptime
+  updated_uptime=()
+
+  for i in "${uptime_array[@]}"; do
+    #removing comma from data in uptime_array and storing it in updated_uptime array
+    updated_uptime+=("$(echo "$i" | tr -d ',')")
+  done
+
+  # Call the function to calculate averages and store them in a n
+  calculate_average "${memfree_array[@]}"
+
+  for i in "${!mnemonic_array[@]}"; do
+    
+    # printf "%.2f\n" "${result_array[i]}"
+    mnemonic="${mnemonic_array[i]//[$'\r']}"
+    uptime="${updated_uptime[i]//[$'\r']}"
+   
+    uptime=$(convert_to_hours "$uptime")
+    printf "%-15s %-15s %.2f %s\n" "$mnemonic" "$uptime" "${result_array[i]}" >> metrics.txt
+    
+  done
+  #generate_csv
 }
 
 # Function to calculate the average of every three elements
@@ -183,41 +226,68 @@ create_files() {
      filename="$mnemonic""_$metrics_suffix"
      touch "$filename" 
   done
+  #write_files 
+  
 }
+#write_files() {
+  #for i in "${mnemonic_array[@]}"; do
+     #row=$(grep "^$i," metrics.csv)
+     
+     #if [ -n "$row" ]; then
+       #column1=$(echo "$row" | cut -d ',' -f 2)
+       #column2=$(echo "$row" | cut -d ',' -f 3)
+       
+       #echo "$column1,$column2" >> "${i}_output.csv"
+     #fi
+  #done
+#}
+
+#write_files() {
+ #while IFS=',' read -r col1 col2 col3; do
+   #for element in "${mnemonic_array[@]}"; do
+     #if [ "$col1" == "$element" ]; then
+       #echo "$col2,$col3" > "${element}_output.csv"
+     #fi
+   #done
+ #done < metrics.csv
+#}
 
 write_files() {
-  declare -A extracted_values
+declare -A extracted_values
 
-  # Read each line of the "metrics.csv" file
-  while IFS=',' read -r col1 col2 col3; do
-    for element in "${mnemonic_array[@]}"; do
-      if [ "$col1" == "$element" ]; then
-        # Print the matching string
-        #echo "Matching string found: $element"
-        
-        # Append the extracted values to the associative array
-        extracted_values["$element"]+="$col2,$col3"$'\n'
-      fi
-    done
-  done < "$combined_csv_file"
-  #header="soak_duration,uptime,free_memory"
-  # Create separate output files for each matching string
-  soak=("0" "8" "72")
+# Read each line of the "metrics.csv" file
+while IFS=',' read -r col1 col2 col3; do
   for element in "${mnemonic_array[@]}"; do
-    
-  #echo "$header" > "${element}_output.csv"
-    if [ -n "${extracted_values["$element"]}" ]; then-
-      #echo "$header" > "${element}_output.csv"
-      echo -e "${extracted_values["$element"]}" > "${element}_output.csv"
-      sort "${element}_output.csv" | uniq | sed '1d' > "${element}_temp.csv"
-      #paste -d',' <(echo "${soak[@]}") "${element}_output.csv" > "${element}_temp.csv"
-      rm "${element}_output.csv"
-      mv "${element}_temp.csv" "${element}_output.csv"
-      #echo "$header" >> "${element}_output.csv"
+    if [ "$col1" == "$element" ]; then
+      # Print the matching string
+      #echo "Matching string found: $element"
+      
+      # Append the extracted values to the associative array
+      extracted_values["$element"]+="$col2,$col3"$'\n'
+      echo"$extracted_values["$element"]"
     fi
-    #paste -d',' <(seq 0 8 16) "${element}_output.csv"
   done
+done < metrics.csv
+
+#header="soak_duration,uptime,free_memory"
+# Create separate output files for each matching string
+soak=("0" "8" "72")
+for element in "${mnemonic_array[@]}"; do
+  
+ #echo "$header" > "${element}_output.csv"
+  if [ -n "${extracted_values["$element"]}" ]; then
+    #echo "$header" > "${element}_output.csv"
+    echo -e "${extracted_values["$element"]}" > "${element}_output.csv"
+    sort "${element}_output.csv" | uniq | sed '1d' > "${element}_temp.csv"
+    #paste -d',' <(echo "${soak[@]}") "${element}_output.csv" > "${element}_temp.csv"
+    rm "${element}_output.csv"
+    mv "${element}_temp.csv" "${element}_output.csv"
+    #echo "$header" >> "${element}_output.csv"
+  fi
+  #paste -d',' <(seq 0 8 16) "${element}_output.csv"
+done
 }
+
 final_csv() {
   # Define the soak duration sequence
   soak_duration=("0" "8" "16")
@@ -248,7 +318,14 @@ final_csv() {
   done
 }
 
-build_metrics_arrays "Iteration1.txt"
-build_metrics_arrays "Iteration2.txt"
-build_metrics_arrays "Iteration3.txt"
-# python plot_device_metrics.py
+#soak_duration=("0" "8" "72")
+
+# Function to add the first column to a CSV file
+
+
+
+#print_metrics_arrays
+build_metrics_arrays
+print_metrics_arrays
+#print_metrics_arrays
+#python plot_device_metrics.py
