@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Initialize a variable to store the product of diagonal elements
 diagonal_product=1
 
