@@ -39,4 +39,4 @@ print_linear_equations_matrix() {
 }
 
 # Example usage:
-print_linear_equations_matrix 2x -1y 3z 0 4x 2y -2z 1
+# print_linear_equations_matrix 2x -1y 3z 0 4x 2y -2z 1
